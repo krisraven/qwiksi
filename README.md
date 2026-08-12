@@ -2,7 +2,7 @@
 
 qwiksi is a CLI tool for signing PDFs without opening a UI. Point it at a PDF and it signs it.
 
-- Detects and list fillable for fieldss
+- Detects and list fillable for fields
 - Manual x/y coordinates for flat or scanned PDFs with no form fields
 - Can generate a signature image from your name in a cursive font
 
