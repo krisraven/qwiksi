@@ -1,11 +1,15 @@
 # qwiksi
 
-A CLI tool for stamping a signature image onto a PDF.
+qwiksi is a CLI tool for signing PDFs without opening a UI. Point it at a PDF and it signs it.
+
+- Detects and list fillable for fieldss
+- Manual x/y coordinates for flat or scanned PDFs with no form fields
+- Can generate a signature image from your name in a cursive font
 
 ## Table of Contents
 
 - [Install](#install)
-  - [Download a prebuilt binary (recommended)](#download-a-prebuilt-binary-recommended)
+  - [Download a prebuilt binary](#download-a-prebuilt-binary)
   - [Build from source](#build-from-source)
 - [Usage](#usage)
   - [Basic Operation](#basic-operation)
@@ -18,9 +22,9 @@ A CLI tool for stamping a signature image onto a PDF.
 
 ## Install
 
-### Download a prebuilt binary (recommended)
+### Download a prebuilt binary
 
-Download the archive for your platform from the [latest release](https://github.com/krisraven/qwiksi/releases/latest), extract it and put `qwiksi` on your `$PATH`.
+Download the archive for your platform from the [latest release](https://github.com/krisraven/qwiksi/releases/latest), extract it and put `qwiksi` in your `$PATH`.
 
 ```
 # macOS (Apple Silicon)
@@ -35,7 +39,6 @@ sudo mv qwiksi /usr/local/bin/
 curl -L https://github.com/krisraven/qwiksi/releases/latest/download/qwiksi_linux_amd64.tar.gz | tar xz
 sudo mv qwiksi /usr/local/bin/
 ```
-
 `arm64` archives are also published for Linux, and Windows builds (`amd64`/`arm64`) are available as `.zip` - see the [releases page](https://github.com/krisraven/qwiksi/releases) for the full list. Each release includes a `checksums.txt` to verify your download against.
 
 ### Build from source
@@ -52,13 +55,13 @@ Produces a single static binary with no runtime dependencies.
 
 ### Basic Operation
 
-Most modern PDF documents use AcroForm fields, and the fields are hopefully labelled sensibly (a box that needs a signature is named **Signature**, and so on).
+Most modern PDF documents use AcroForm fields, and hopefully the fields are labelled sensibly (a box that needs a signature is named **Signature**, and so on).
 
 If your PDF is using this format, it means that you can just type `qwiksi` and then follow the prompts. 
 
-If the boxes are not named sensibly, then you'll have to [get the fields](#2-check-for-existing-form-fields)
+If the boxes are not named sensibly, then you'll have to [get the fields](#2-check-for-existing-form-fields).
 
-If the PDF doesn't have AcroFields (if is flat or a scanned document), then you can use [manual mode](#singing-using-manual-coordinate-mode). Remember to first [get the coordinates](#3-find-coordinates)
+If the PDF doesn't have AcroFields (if is flat or a scanned document), then you can use [manual mode](#singing-using-manual-coordinate-mode). You'll first need to [get the coordinates](#3-find-coordinates).
 
 ### 1. Don't have a signature image? Generate one
 
@@ -117,16 +120,13 @@ qwiksi sign input.pdf --signature sig.png --field "Signature" [--output signed.p
 Using this the image can be placed at an absolute position:
 
 ```
-qwiksi sign input.pdf --signature sig.png --page 1 --x 150 --y 100 [--width 150] [--height H] [--output signed.pdf]
+qwiksi sign input.pdf --signature sig.png --page 1 --x 150 --y 100 [--width 150] [--height 100] [--output signed.pdf]
 ```
 
 `--width`/`--height` are optional; default is 150pt wide with height derived
 from the signature image's aspect ratio. Output defaults to
 `<input>_signed.pdf`.
 
-In either mode, swap `--signature sig.png` for `--text "Your Name" [--font
-1|2] [--size 100] [--color 000000]` to render and stamp the signature in one
-go, skipping step 1 above entirely.
 
 ## Notes
 

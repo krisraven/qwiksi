@@ -16,10 +16,6 @@ const interactiveDefaultFont = "1"
 const interactiveDefaultSize = 100
 const interactiveDefaultColor = "000000"
 
-// runInteractive drives the guided flow used when qwiksi is run with no
-// arguments: pick a PDF, and if it has AcroForm fields, pick one and a
-// signature text, then sign it. Flat PDFs get pointed at the manual
-// --page/--x/--y flow instead, since there's no field to prompt for.
 func runInteractive() error {
 	fmt.Print(`qwiksi - quick PDF signing
 
@@ -129,9 +125,6 @@ func hasField(fields []form.Field, name string) bool {
 	return false
 }
 
-// prompt prints label, reads a line from r, and returns it trimmed. Hitting
-// EOF (e.g. piped-in input running out) after some text was already typed
-// still returns that text rather than erroring.
 func prompt(r *bufio.Reader, label string) (string, error) {
 	fmt.Print(label)
 	line, err := r.ReadString('\n')

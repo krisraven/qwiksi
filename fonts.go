@@ -19,8 +19,7 @@ type cursiveFont struct {
 }
 
 // cursiveFonts are bundled directly into the binary (SIL Open Font
-// License - see assets/fonts/OFL-*.txt) so qwiksi stays a single
-// dependency-free binary on any OS.
+// License - see assets/fonts/OFL-*.txt)
 var cursiveFonts = []cursiveFont{
 	{id: "1", name: "Sacramento (casual script)", data: fontSacramento},
 	{id: "2", name: "Great Vibes (formal script)", data: fontGreatVibes},
