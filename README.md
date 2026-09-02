@@ -13,10 +13,11 @@ qwiksi is a CLI tool for signing PDFs without opening a UI. Point it at a PDF an
   - [Build from source](#build-from-source)
 - [Usage](#usage)
   - [Basic Operation](#basic-operation)
-  - [1. Don't have a signature image? Generate one](#1-dont-have-a-signature-image-generate-one)
-  - [2. Check for existing form fields](#2-check-for-existing-form-fields)
-  - [3. Find coordinates](#3-find-coordinates)
-  - [4. Sign](#4-sign)
+  - [1. Preview the bundled fonts](#1-preview-the-bundled-fonts)
+  - [2. Don't have a signature image? Generate one](#2-dont-have-a-signature-image-generate-one)
+  - [3. Check for existing form fields](#3-check-for-existing-form-fields)
+  - [4. Find coordinates](#4-find-coordinates)
+  - [5. Sign](#5-sign)
     - [Singing using manual coordinate mode](#singing-using-manual-coordinate-mode)
 - [Notes](#notes)
 
@@ -59,11 +60,21 @@ Most modern PDF documents use AcroForm fields, and hopefully the fields are labe
 
 If your PDF is using this format, it means that you can just type `qwiksi` and then follow the prompts. 
 
-If the boxes are not named sensibly, then you'll have to [get the fields](#2-check-for-existing-form-fields).
+If the boxes are not named sensibly, then you'll have to [get the fields](#3-check-for-existing-form-fields).
 
-If the PDF doesn't have AcroFields (if is flat or a scanned document), then you can use [manual mode](#singing-using-manual-coordinate-mode). You'll first need to [get the coordinates](#3-find-coordinates).
+If the PDF doesn't have AcroFields (if is flat or a scanned document), then you can use [manual mode](#singing-using-manual-coordinate-mode). You'll first need to [get the coordinates](#4-find-coordinates).
 
-### 1. Don't have a signature image? Generate one
+### 1. Preview the bundled fonts
+
+Not sure which font you want? Generate a one-page specimen PDF with every
+bundled font rendering its own name in itself, so you can view them side by
+side before picking a `--font` id for `addsig`/`sign` below:
+
+```
+qwiksi fontdemo [--out fontdemo.pdf] [--size 44] [--color 000000]
+```
+
+### 2. Don't have a signature image? Generate one
 
 ```
 qwiksi addsig --text "Your Name" [--font 1-6] [--size 100] [--color 000000] [--out signature.png]
@@ -86,14 +97,7 @@ in between.
 
 `--color` is a 6-digit hex RGB value (default `000000`, black).
 
-Not sure which one you want? Generate a one-page specimen PDF with every
-bundled font rendering its own name in itself:
-
-```
-qwiksi fontdemo [--out fontdemo.pdf] [--size 44] [--color 000000]
-```
-
-### 2. Check for existing form fields
+### 3. Check for existing form fields
 
 If the PDF is already a fillable form, it may have a signature field you can
 target by name:
@@ -106,7 +110,7 @@ This prints each field's name, type, page numer and rect (the field's bounding b
 
 If there are none, you should use the coordinate-based flow, out-lined below, instead.
 
-### 3. Find coordinates
+### 4. Find coordinates
 
 ```
 qwiksi preview input.pdf --page 1 [--grid 50] [--out preview.pdf]
@@ -118,7 +122,7 @@ to read off where you want the signature. Coordinates are in PDF points,
 measured from the **bottom-left** corner of the page, matching what `sign
 --x --y` expects below.
 
-### 4. Sign
+### 5. Sign
 
 If the PDF has AcroSign fields `qwiksi` will place the image into the named AcroForm field. The signature is scaled to fit and centered within it:
 
@@ -141,7 +145,7 @@ from the signature image's aspect ratio. Output defaults to
 
 ## Notes
 
-- `--signature` accepts PNG or JPEG. For best results, use a PNG signature image with a transparent background (or use `addsig` to [create one](#1-dont-have-a-signature-image-generate-one))
+- `--signature` accepts PNG or JPEG. For best results, use a PNG signature image with a transparent background (or use `addsig` to [create one](#2-dont-have-a-signature-image-generate-one))
 - Coordinates and dimensions are all in PDF points (1/72 inch), origin at
   the page's bottom-left corner. The same convention is used in `preview` when the grid is drawn, so numbers in the preview PDF map directly onto `sign` flags,
 - Built using [pdfcpu](https://pdfcpu.io),
