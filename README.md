@@ -46,7 +46,7 @@ sudo mv qwiksi /usr/local/bin/
 Requires Go 1.25+.
 
 ```
-go build -o qwiksi .
+go build -ldflags="-s -w" -o qwiksi .
 ```
 
 Produces a single static binary with no runtime dependencies.

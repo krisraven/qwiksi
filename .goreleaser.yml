@@ -10,6 +10,8 @@ builds:
     main: .
     env:
       - CGO_ENABLED=0
+    ldflags:
+      - -s -w
     goos:
       - darwin
       - linux
