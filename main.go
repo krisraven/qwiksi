@@ -25,6 +25,8 @@ func main() {
 		err = runSign(os.Args[2:])
 	case "addsig":
 		err = runAddSig(os.Args[2:])
+	case "fontdemo":
+		err = runFontDemo(os.Args[2:])
 	case "-h", "--help", "help":
 		usage()
 		return
@@ -55,12 +57,13 @@ func usage() {
 	fmt.Fprint(os.Stderr, `qwiksi - stamp a signature image onto a PDF from the command line
 
 Usage:
-  qwiksi sign    <input.pdf> --text "Your Name" [--font 1|2] [--size 100] [--color 000000] --field "FieldName" [--output out.pdf]
+  qwiksi sign    <input.pdf> --text "Your Name" [--font 1-6] [--size 100] [--color 000000] --field "FieldName" [--output out.pdf]
   qwiksi sign    <input.pdf> --signature sig.png --field "FieldName" [--output out.pdf]
   qwiksi sign    <input.pdf> --signature sig.png --page N --x X --y Y [--width W] [--height H] [--output out.pdf]
-  qwiksi addsig  --text "Your Name" [--font 1|2] [--size 100] [--color 000000] [--out signature.png]
+  qwiksi addsig  --text "Your Name" [--font 1-6] [--size 100] [--color 000000] [--out signature.png]
   qwiksi fields  <input.pdf>
   qwiksi preview <input.pdf> --page N [--grid 50] [--out preview.pdf]
+  qwiksi fontdemo [--out fontdemo.pdf] [--size 44] [--color 000000]
 
 Run "qwiksi <command> -h" for command-specific flags.
 `)
