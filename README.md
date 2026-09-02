@@ -66,11 +66,11 @@ If the PDF doesn't have AcroFields (if is flat or a scanned document), then you 
 ### 1. Don't have a signature image? Generate one
 
 ```
-qwiksi addsig --text "Your Name" [--font 1|2] [--size 100] [--color 000000] [--out signature.png]
+qwiksi addsig --text "Your Name" [--font 1-6] [--size 100] [--color 000000] [--out signature.png]
 ```
 
 Renders your name in a cursive font as a transparent-background PNG, ready to
-feed into `sign --signature` below. Two bundled fonts are embedded in the
+feed into `sign --signature` below. Six bundled fonts are embedded in the
 binary, no external files needed. Or skip this step entirely - `sign` below
 accepts `--text` directly and renders the signature on the fly, no PNG file
 in between.
@@ -79,8 +79,19 @@ in between.
 |---|---|---|
 | `1` (default) | Sacramento | casual, flowing |
 | `2` | Great Vibes | elegant, formal |
+| `3` | Qwigley | tall, looping monoline |
+| `4` | Satisfy | relaxed marker script |
+| `5` | Allura | delicate, calligraphic |
+| `6` | Alex Brush | brush-pen calligraphy |
 
 `--color` is a 6-digit hex RGB value (default `000000`, black).
+
+Not sure which one you want? Generate a one-page specimen PDF with every
+bundled font rendering its own name in itself:
+
+```
+qwiksi fontdemo [--out fontdemo.pdf] [--size 44] [--color 000000]
+```
 
 ### 2. Check for existing form fields
 
@@ -91,7 +102,7 @@ target by name:
 qwiksi fields input.pdf
 ```
 
-Prints each field's name, type, page numer and rect (the field's bounding box on the page ). 
+This prints each field's name, type, page numer and rect (the field's bounding box on the page ). 
 
 If there are none, you should use the coordinate-based flow, out-lined below, instead.
 
@@ -134,5 +145,6 @@ from the signature image's aspect ratio. Output defaults to
 - Coordinates and dimensions are all in PDF points (1/72 inch), origin at
   the page's bottom-left corner. The same convention is used in `preview` when the grid is drawn, so numbers in the preview PDF map directly onto `sign` flags,
 - Built using [pdfcpu](https://pdfcpu.io),
-- The bundled fonts (Sacramento, Great Vibes) are Google Fonts under the SIL
-  Open Font License 1.1.
+- The bundled fonts are Google Fonts. Sacramento, Great Vibes, Qwigley,
+  Allura and Alex Brush are under the SIL Open Font License 1.1; Satisfy is
+  under the Apache License 2.0.
