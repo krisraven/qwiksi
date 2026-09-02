@@ -12,7 +12,6 @@ import (
 	"strings"
 
 	"golang.org/x/image/font"
-	"golang.org/x/image/font/opentype"
 	"golang.org/x/image/math/fixed"
 )
 
@@ -21,16 +20,20 @@ const addSigPaddingPt = 20
 func runAddSig(args []string) error {
 	fs := flag.NewFlagSet("addsig", flag.ExitOnError)
 	text := fs.String("text", "", "signature text to render (required)")
-	fontID := fs.String("font", "1", "cursive font: 1 (Sacramento) or 2 (Great Vibes)")
+	fontID := fs.String("font", "1", "cursive font: 1 (Sacramento), 2 (Great Vibes), 3 (Qwigley), 4 (Satisfy), 5 (Allura) or 6 (Alex Brush)")
 	out := fs.String("out", "signature.png", "output PNG path")
 	size := fs.Float64("size", 100, "font size in points")
 	colorHex := fs.String("color", "000000", "signature ink color as a hex RGB triple")
 	fs.Usage = func() {
-		fmt.Println(`Usage: qwiksi addsig --text "Your Name" [--font 1|2] [--size 100] [--color 000000] [--out signature.png]
+		fmt.Println(`Usage: qwiksi addsig --text "Your Name" [--font 1-6] [--size 100] [--color 000000] [--out signature.png]
 
 Fonts:
   1  Sacramento  - casual flowing script
-  2  Great Vibes - elegant formal script`)
+  2  Great Vibes - elegant formal script
+  3  Qwigley     - tall looping monoline
+  4  Satisfy     - relaxed marker script
+  5  Allura      - delicate calligraphic
+  6  Alex Brush  - brush-pen calligraphy`)
 	}
 	fs.Parse(args)
 
@@ -71,22 +74,9 @@ Fonts:
 // to a PNG file) and `sign --text` (feeds it directly into the stamping
 // step without an intermediate file).
 func renderSignatureImage(text, fontID string, size float64, col color.RGBA) (*image.RGBA, string, error) {
-	cf, err := lookupFont(fontID)
+	face, cf, err := loadCursiveFace(fontID, size)
 	if err != nil {
 		return nil, "", err
-	}
-
-	sfntFont, err := opentype.Parse(cf.data)
-	if err != nil {
-		return nil, "", fmt.Errorf("parsing font: %w", err)
-	}
-	face, err := opentype.NewFace(sfntFont, &opentype.FaceOptions{
-		Size:    size,
-		DPI:     72, // 1pt == 1px, matching the point convention used elsewhere in qwiksi
-		Hinting: font.HintingFull,
-	})
-	if err != nil {
-		return nil, "", fmt.Errorf("creating font face: %w", err)
 	}
 	defer face.Close()
 

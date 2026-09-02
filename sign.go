@@ -14,7 +14,7 @@ func runSign(args []string) error {
 	fs := flag.NewFlagSet("sign", flag.ExitOnError)
 	sig := fs.String("signature", "", "path to an existing signature image (PNG/JPEG)")
 	text := fs.String("text", "", "signature text to render on the fly, instead of --signature")
-	fontID := fs.String("font", "1", "cursive font for --text: 1 (Sacramento) or 2 (Great Vibes)")
+	fontID := fs.String("font", "1", "cursive font for --text: 1 (Sacramento), 2 (Great Vibes), 3 (Qwigley), 4 (Satisfy), 5 (Allura) or 6 (Alex Brush)")
 	size := fs.Float64("size", 100, "font size in points for --text")
 	colorHex := fs.String("color", "000000", "signature ink color as a hex RGB triple for --text")
 	out := fs.String("output", "", "output PDF path (default: <input>_signed.pdf)")
@@ -29,7 +29,7 @@ func runSign(args []string) error {
   qwiksi sign <input.pdf> --signature sig.png --field "FieldName" [--output out.pdf]
   qwiksi sign <input.pdf> --signature sig.png --page N --x X --y Y [--width W] [--height H] [--output out.pdf]
 
-Instead of --signature, pass --text "Your Name" [--font 1|2] [--size 100] [--color 000000]
+Instead of --signature, pass --text "Your Name" [--font 1-6] [--size 100] [--color 000000]
 to render the signature on the fly - no separate addsig step needed.`)
 	}
 	inFile, rest, err := takeInputFile(args)
