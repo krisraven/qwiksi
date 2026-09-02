@@ -102,7 +102,7 @@ target by name:
 qwiksi fields input.pdf
 ```
 
-Prints each field's name, type, page numer and rect (the field's bounding box on the page ). 
+This prints each field's name, type, page numer and rect (the field's bounding box on the page ). 
 
 If there are none, you should use the coordinate-based flow, out-lined below, instead.
 
