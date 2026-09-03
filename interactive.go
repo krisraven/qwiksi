@@ -95,7 +95,23 @@ Use the coordinate-based flow instead, e.g.:
 		return fmt.Errorf("signature text can't be empty")
 	}
 
-	sigPath, err := writeTempSignaturePNG(text, interactiveDefaultFont, interactiveDefaultSize, interactiveDefaultColor)
+	fmt.Println("\nFonts:")
+	for _, f := range cursiveFonts {
+		fmt.Printf("  %s. %s\n", f.id, f.name)
+	}
+	fontInput, err := prompt(r, fmt.Sprintf("Font [%s]: ", interactiveDefaultFont))
+	if err != nil {
+		return err
+	}
+	fontID := interactiveDefaultFont
+	if fontInput != "" {
+		if _, err := lookupFont(fontInput); err != nil {
+			return err
+		}
+		fontID = fontInput
+	}
+
+	sigPath, err := writeTempSignaturePNG(text, fontID, interactiveDefaultSize, interactiveDefaultColor)
 	if err != nil {
 		return err
 	}
