@@ -20,7 +20,13 @@ func runFields(args []string) error {
 	}
 	inFile := fs.Arg(0)
 
-	ctx, err := api.ReadContextFile(inFile)
+	readFile, cleanup, err := prepareInput(inFile)
+	if err != nil {
+		return fmt.Errorf("reading %s: %w", inFile, err)
+	}
+	defer cleanup()
+
+	ctx, err := api.ReadContextFile(readFile)
 	if err != nil {
 		return fmt.Errorf("reading %s: %w", inFile, err)
 	}

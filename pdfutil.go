@@ -32,6 +32,81 @@ func imageDimsPx(path string) (w, h int, err error) {
 	return cfg.Width, cfg.Height, nil
 }
 
+// prepareInput returns the path qwiksi's pdfcpu calls should actually read:
+// inFile itself when it already validates, or a repaired temp copy when the
+// only problem is a missing/empty AcroForm-level /DA. Real-world PDF
+// generators routinely omit it (relying on viewers to fall back to a
+// default appearance), but pdfcpu's validator rejects it even in relaxed
+// mode - see https://github.com/pdfcpu/pdfcpu/issues/1274 for the same gap
+// with the sibling /FT entry. Any other validation failure is returned
+// unchanged so real problems still surface. The returned cleanup always
+// runs safely, removing the temp file if one was created.
+func prepareInput(inFile string) (path string, cleanup func(), err error) {
+	noop := func() {}
+
+	f, err := os.Open(inFile)
+	if err != nil {
+		return "", noop, err
+	}
+	defer f.Close()
+
+	ctx, err := api.ReadContext(f, model.NewDefaultConfiguration())
+	if err != nil {
+		return "", noop, err
+	}
+
+	origErr := api.ValidateContext(ctx)
+	if origErr == nil {
+		return inFile, noop, nil
+	}
+
+	root, catErr := ctx.XRefTable.Catalog()
+	if catErr != nil {
+		return "", noop, origErr
+	}
+	acroFormObj, ok := root.Find("AcroForm")
+	if !ok {
+		return "", noop, origErr
+	}
+	acroForm, derefErr := ctx.XRefTable.DereferenceDict(acroFormObj)
+	if derefErr != nil || acroForm == nil {
+		return "", noop, origErr
+	}
+
+	sl := acroForm.StringLiteralEntry("DA")
+	hasUsableDA := acroForm.HasEntry("DA") && !(sl != nil && string(*sl) == "")
+	if hasUsableDA {
+		// AcroForm already has a DA, so this isn't the gap we know how to
+		// repair - the failure is something else.
+		return "", noop, origErr
+	}
+	acroForm["DA"] = types.StringLiteral("/Helv 0 Tf 0 g")
+
+	if err := api.ValidateContext(ctx); err != nil {
+		// Repair didn't help - report the original failure.
+		return "", noop, origErr
+	}
+
+	tmp, err := os.CreateTemp("", "qwiksi-repaired-*.pdf")
+	if err != nil {
+		return "", noop, origErr
+	}
+	tmpPath := tmp.Name()
+	cleanup = func() { os.Remove(tmpPath) }
+
+	if err := api.WriteContext(ctx, tmp); err != nil {
+		tmp.Close()
+		cleanup()
+		return "", noop, origErr
+	}
+	if err := tmp.Close(); err != nil {
+		cleanup()
+		return "", noop, origErr
+	}
+
+	return tmpPath, cleanup, nil
+}
+
 // fieldWidget holds one candidate widget annotation for a field name: its
 // dict (carrying /Rect) and that dict's own object number, which identifies
 // the widget annotation itself - callers need it to strip the annotation
