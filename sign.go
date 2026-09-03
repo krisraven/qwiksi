@@ -39,6 +39,12 @@ to render the signature on the fly - no separate addsig step needed.`)
 	}
 	fs.Parse(rest)
 
+	readFile, cleanup, err := prepareInput(inFile)
+	if err != nil {
+		return fmt.Errorf("reading %s: %w", inFile, err)
+	}
+	defer cleanup()
+
 	if (*sig == "") == (*text == "") {
 		return fmt.Errorf("specify exactly one of --signature or --text")
 	}
@@ -72,7 +78,7 @@ to render the signature on the fly - no separate addsig step needed.`)
 	var pageNr, widgetObjNr int
 
 	if fieldMode {
-		dx, dy, scale, pageNr, widgetObjNr, err = fieldPlacement(inFile, *field, 0, imgW, imgH)
+		dx, dy, scale, pageNr, widgetObjNr, err = fieldPlacement(readFile, *field, 0, imgW, imgH)
 		if err != nil {
 			return err
 		}
@@ -93,7 +99,7 @@ to render the signature on the fly - no separate addsig step needed.`)
 		}
 	}
 
-	if err := stampSignature(inFile, *sig, *out, dx, dy, scale, pageNr, fieldMode, widgetObjNr); err != nil {
+	if err := stampSignature(readFile, *sig, *out, dx, dy, scale, pageNr, fieldMode, widgetObjNr); err != nil {
 		return err
 	}
 

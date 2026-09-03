@@ -27,12 +27,18 @@ func runPreview(args []string) error {
 	}
 	fs.Parse(rest)
 
+	readFile, cleanup, err := prepareInput(inFile)
+	if err != nil {
+		return fmt.Errorf("reading %s: %w", inFile, err)
+	}
+	defer cleanup()
+
 	if *out == "" {
 		ext := filepath.Ext(inFile)
 		*out = strings.TrimSuffix(inFile, ext) + "_preview" + ext
 	}
 
-	dims, err := api.PageDimsFile(inFile)
+	dims, err := api.PageDimsFile(readFile)
 	if err != nil {
 		return fmt.Errorf("reading page dimensions: %w", err)
 	}
@@ -58,7 +64,7 @@ func runPreview(args []string) error {
 		return fmt.Errorf("building grid overlay watermark: %w", err)
 	}
 
-	if err := api.AddWatermarksFile(inFile, *out, []string{fmt.Sprintf("%d", *page)}, wm, nil); err != nil {
+	if err := api.AddWatermarksFile(readFile, *out, []string{fmt.Sprintf("%d", *page)}, wm, nil); err != nil {
 		return fmt.Errorf("stamping grid overlay onto page %d: %w", *page, err)
 	}
 

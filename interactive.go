@@ -36,7 +36,13 @@ Other commands: fields, preview, sign, addsig (run "qwiksi <command> -h" for det
 		return fmt.Errorf("can't read %s: %w", inFile, err)
 	}
 
-	ctx, err := api.ReadContextFile(inFile)
+	readFile, cleanup, err := prepareInput(inFile)
+	if err != nil {
+		return fmt.Errorf("reading %s: %w", inFile, err)
+	}
+	defer cleanup()
+
+	ctx, err := api.ReadContextFile(readFile)
 	if err != nil {
 		return fmt.Errorf("reading %s: %w", inFile, err)
 	}
@@ -100,7 +106,7 @@ Use the coordinate-based flow instead, e.g.:
 		return err
 	}
 
-	dx, dy, scale, pageNr, widgetObjNr, err := fieldPlacement(inFile, fieldName, desiredPage, imgW, imgH)
+	dx, dy, scale, pageNr, widgetObjNr, err := fieldPlacement(readFile, fieldName, desiredPage, imgW, imgH)
 	if err != nil {
 		return err
 	}
@@ -108,7 +114,7 @@ Use the coordinate-based flow instead, e.g.:
 	ext := filepath.Ext(inFile)
 	outFile := strings.TrimSuffix(inFile, ext) + "_signed" + ext
 
-	if err := stampSignature(inFile, sigPath, outFile, dx, dy, scale, pageNr, true, widgetObjNr); err != nil {
+	if err := stampSignature(readFile, sigPath, outFile, dx, dy, scale, pageNr, true, widgetObjNr); err != nil {
 		return err
 	}
 
